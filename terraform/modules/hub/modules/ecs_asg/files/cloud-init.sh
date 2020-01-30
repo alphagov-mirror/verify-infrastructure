@@ -3,6 +3,14 @@ set -ueo pipefail
 
 export DEBIAN_FRONTEND=noninteractive
 
+# If this script errors then mark instances as unhealthy so that asg will cycle it
+function mark_unhealthy() {
+  aws autoscaling set-instance-health \
+    --instance-id "$(curl http://169.254.169.254/latest/meta-data/instance-id)" \
+    --health-status Unhealthy
+}
+trap "mark_unhealthy" ERR
+
 CURL="curl"
 if [ -n "${egress_proxy_url_with_protocol}" ]; then
   CURL="curl --proxy ${egress_proxy_url_with_protocol}"

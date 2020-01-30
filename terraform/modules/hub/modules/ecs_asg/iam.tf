@@ -98,7 +98,8 @@ resource "aws_iam_policy" "instance" {
           "ecs:DiscoverPollEndpoint",
           "ecs:StartTelemetrySession",
           "ecs:Poll",
-          "ecs:Submit*"
+          "ecs:Submit*",
+          "autoscaling:SetInstanceHealth"
         ],
         "Resource": "*"
       },
