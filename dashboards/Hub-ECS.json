@@ -2170,7 +2170,7 @@
       ],
       "targets": [
         {
-          "expr": "node_memory_MemFree / 1024 / 1024 / 1024",
+          "expr": "(node_memory_MemFree + node_memory_Buffers + node_memory_Cached) / 1024 / 1024 / 1024",
           "format": "table",
           "instant": true,
           "interval": "",
