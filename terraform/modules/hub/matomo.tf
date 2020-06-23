@@ -63,7 +63,7 @@ resource "aws_lb_listener" "matomo_https" {
   load_balancer_arn = aws_lb.matomo.arn
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = data.terraform_remote_state.account.outputs.tools_wildcard_cert_arn
+  certificate_arn   = aws_acm_certificate.mgmt_wildcard.arn
 
   default_action {
     type = "fixed-response"
@@ -125,7 +125,7 @@ data "template_file" "matomo_task_def" {
 }
 
 resource "aws_ecs_task_definition" "matomo_task_def" {
-  family                = "matomo" ## TODO: what is this
+  family                = "matomo"
   container_definitions = data.template_file.matomo_task_def.rendered
   network_mode          = "awsvpc"
   execution_role_arn    = aws_iam_role.matomo_execution.arn
@@ -209,14 +209,14 @@ resource "aws_security_group" "matomo_lb" {
   description = "Security group for matomo application load balancer"
   vpc_id      = aws_vpc.hub.id
 }
-resource "aws_security_group_rule" "matomo_lb_ingress_80_gds" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  security_group_id = aws_security_group.matomo_lb.id
-  cidr_blocks       = local.gds_ip_cidrs ##TODO: ???
-}
+# resource "aws_security_group_rule" "matomo_lb_ingress_80_gds" {
+#   type              = "ingress"
+#   from_port         = 80
+#   to_port           = 80
+#   protocol          = "tcp"
+#   security_group_id = aws_security_group.matomo_lb.id
+#   cidr_blocks       = var.mgmt_accessible_from_cidrs
+# }
 
 resource "aws_security_group_rule" "matomo_lb_ingress_443_gds" {
   type              = "ingress"
@@ -224,11 +224,11 @@ resource "aws_security_group_rule" "matomo_lb_ingress_443_gds" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.matomo_lb.id
-  cidr_blocks       = local.gds_ip_cidrs ##  TODO: ??
+  cidr_blocks       = var.mgmt_accessible_from_cidrs
 }
 
 resource "aws_security_group" "matomo_common" {
-  name        = "matomo-common"
+  name        = "matomo-common"  # Namespace later???
   description = "Common security group for matomo instances"
   vpc_id      = aws_vpc.hub.id
 }
@@ -314,7 +314,7 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "matomo" {
-  name = "matomo"
+  name = "matomo"  #Namespaced???
 }
 
 resource "aws_iam_policy" "matomo_web_secrets" {
@@ -460,7 +460,7 @@ resource "aws_cloudwatch_event_rule" "every_hour" {
 }
 
 data "template_file" "matomo_config_part_one_file" {
-  template = file("files/matomo-config-file-part-one.ini.php")
+  template = file("files/matomo/matomo-config-file-part-one.ini.php")
 
   vars = {
     db_host     = aws_db_instance.matomo.address
@@ -561,4 +561,3 @@ resource "aws_security_group_rule" "matomo_db_allows_ingress_from_matomo" {
   security_group_id        = aws_security_group.matomo_db.id
   source_security_group_id = aws_security_group.matomo.id
 }
-
