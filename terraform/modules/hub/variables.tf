@@ -205,3 +205,4 @@ variable "cloudwatch_exporter_image_digest" {}
 variable "squid_image_digest" {}
 variable "metadate_exporter_image_digest" {}
 variable "prometheus_image_digest" {}
+variable "matomo_image_digest" {}

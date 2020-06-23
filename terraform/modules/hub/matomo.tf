@@ -112,14 +112,14 @@ resource "aws_route53_record" "matomo" {
 # }
 
 data "template_file" "matomo_task_def" {
-  template = file("files/matomo/matomo-task-def.json")
+  template = file("${path.module}/files/matomo/matomo-task-def.json")
 
   vars = {
     matomo_config_file_part_one_arn = aws_ssm_parameter.matomo_config_file_part_one.arn
     matomo_config_file_part_two_arn = aws_ssm_parameter.matomo_config_file_part_two.arn
     volume_name                     = local.volume_name
     image_and_tag                   = "${local.tools_account_ecr_url_prefix}-verify-matomo@${var.matomo_image_digest}"
-    location_blocks_base64          = base64encode(file("files/matomo/nginx.conf"))
+    location_blocks_base64          = base64encode(file("${path.module}/files/matomo/nginx.conf"))
     log_format_base64               = local.nginx_log_format_base64
   }
 }
@@ -136,7 +136,7 @@ resource "aws_ecs_task_definition" "matomo_task_def" {
 }
 
 data "template_file" "matomo_archiving_task_def" {
-  template = file("files/matomo/matomo-archiving-def.json")
+  template = file("${path.module}/files/matomo/matomo-archiving-def.json")
 
   vars = {
     matomo_config_file_part_one_arn = aws_ssm_parameter.matomo_config_file_part_one.arn
@@ -158,7 +158,7 @@ resource "aws_ecs_task_definition" "matomo_archiving_task_def" {
 }
 
 data "template_file" "matomo_adhoc_task_def" {
-  template = file("files/matomo/matomo-adhoc-def.json")
+  template = file("${path.module}/files/matomo/matomo-adhoc-def.json")
 
   vars = {
     image_and_tag = "mysql:5"
@@ -460,7 +460,7 @@ resource "aws_cloudwatch_event_rule" "every_hour" {
 }
 
 data "template_file" "matomo_config_part_one_file" {
-  template = file("files/matomo/matomo-config-file-part-one.ini.php")
+  template = file("${path.module}/files/matomo/matomo-config-file-part-one.ini.php")
 
   vars = {
     db_host     = aws_db_instance.matomo.address
@@ -481,7 +481,7 @@ resource "aws_ssm_parameter" "matomo_config_file_part_two" {
   description = "Base64 encoded config file part two for Matomo"
   type        = "SecureString"
   key_id      = aws_kms_key.matomo.arn
-  value       = base64encode(file("files/matomo/matomo-config-file-part-two.ini.php"))
+  value       = base64encode(file("${path.module}/files/matomo/matomo-config-file-part-two.ini.php"))
 }
 
 resource "random_string" "matomo_db_password" {
