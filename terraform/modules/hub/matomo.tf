@@ -209,14 +209,6 @@ resource "aws_security_group" "matomo_lb" {
   description = "Security group for matomo application load balancer"
   vpc_id      = aws_vpc.hub.id
 }
-# resource "aws_security_group_rule" "matomo_lb_ingress_80_gds" {
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 80
-#   protocol          = "tcp"
-#   security_group_id = aws_security_group.matomo_lb.id
-#   cidr_blocks       = var.mgmt_accessible_from_cidrs
-# }
 
 resource "aws_security_group_rule" "matomo_lb_ingress_443_gds" {
   type              = "ingress"
@@ -227,45 +219,49 @@ resource "aws_security_group_rule" "matomo_lb_ingress_443_gds" {
   cidr_blocks       = var.mgmt_accessible_from_cidrs
 }
 
-resource "aws_security_group" "matomo_common" {
-  name        = "matomo-common"  # Namespace later???
+resource "aws_security_group" "matomo" {
+  name        = "matomo-common" # Namespace later???
   description = "Common security group for matomo instances"
   vpc_id      = aws_vpc.hub.id
 }
-resource "aws_security_group_rule" "matomo_common_ingress_all_matomo_common" {
+
+resource "aws_security_group_rule" "matomo_ingress_self" {
   type      = "ingress"
   from_port = 0
   to_port   = 65535
   protocol  = "tcp"
 
-  security_group_id        = aws_security_group.matomo_common.id
-  source_security_group_id = aws_security_group.matomo_common.id
+  security_group_id        = aws_security_group.matomo.id
+  source_security_group_id = aws_security_group.matomo.id
 }
-resource "aws_security_group_rule" "matomo_common_egress_all" {
+
+resource "aws_security_group_rule" "matomo_egress_all" {
   type              = "egress"
   from_port         = 0
   to_port           = 65535
   protocol          = "all"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.matomo_common.id
+  security_group_id = aws_security_group.matomo.id
 }
-resource "aws_security_group_rule" "matomo_common_ingress_all_matomo_lb" {
+
+resource "aws_security_group_rule" "matomo_ingress_all_matomo_lb" {
   type      = "ingress"
   from_port = 0
   to_port   = 65535
   protocol  = "tcp"
 
-  security_group_id        = aws_security_group.matomo_common.id
+  security_group_id        = aws_security_group.matomo.id
   source_security_group_id = aws_security_group.matomo_lb.id
 }
-resource "aws_security_group_rule" "matomo_lb_egress_all_matomo_common" {
+
+resource "aws_security_group_rule" "matomo_lb_egress_all_matomo" {
   type      = "egress"
   from_port = 0
   to_port   = 65535
   protocol  = "all"
 
   security_group_id        = aws_security_group.matomo_lb.id
-  source_security_group_id = aws_security_group.matomo_common.id
+  source_security_group_id = aws_security_group.matomo.id
 }
 
 resource "aws_ecs_service" "matomo" {
@@ -314,7 +310,7 @@ EOF
 }
 
 resource "aws_cloudwatch_log_group" "matomo" {
-  name = "matomo"  #Namespaced???
+  name = "matomo" #Namespaced???
 }
 
 resource "aws_iam_policy" "matomo_web_secrets" {
@@ -538,12 +534,6 @@ resource "aws_db_instance" "matomo" {
   # 8x vCPU, 25.5x ECU, 32GiB RAM
   # more here: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html
   instance_class = "db.m4.2xlarge"
-}
-
-resource "aws_security_group" "matomo" {
-  name        = "matomo"
-  description = "matomo"
-  vpc_id      = aws_vpc.hub.id
 }
 
 resource "aws_security_group" "matomo_db" {
