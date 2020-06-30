@@ -88,29 +88,6 @@ resource "aws_route53_record" "matomo" {
   }
 }
 
-# resource "aws_route53_record" "matomo_tools" {
-#   zone_id = data.terraform_remote_state.account.outputs.tools_zone_id
-#   name    = data.terraform_remote_state.account.outputs.tools_fqdn
-#   type    = "A"
-
-#   alias {
-#     name                   = aws_lb.matomo.dns_name
-#     zone_id                = aws_lb.matomo.zone_id
-#     evaluate_target_health = false
-#   }
-# }
-# data "aws_ecr_repository" "matomo" {
-#   name = "matomo-deployer-verify-matomo"
-# }
-
-# data "aws_ecs_cluster" "matomo" {
-#   cluster_name = data.terraform_remote_state.matomo.outputs.matomo_web_cluster
-# }
-
-# data "local_file" "matomo_nginx_locations" {
-#   filename = "${path.module}/files/nginx.conf"
-# }
-
 data "template_file" "matomo_task_def" {
   template = file("${path.module}/files/matomo/matomo-task-def.json")
 
