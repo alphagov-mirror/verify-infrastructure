@@ -503,7 +503,7 @@ locals {
 }
 
 resource "aws_db_parameter_group" "matomo" {
-  name   = "matamo-rds-pg"
+  name   = "matamo-rds"
   family = "${local.engine}${local.engine_version}"
 
   parameter {
