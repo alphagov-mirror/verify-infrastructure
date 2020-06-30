@@ -154,7 +154,7 @@ resource "aws_ecs_task_definition" "matomo_archiving_task_def" {
   cpu    = 512
   memory = 2048
 
-  requires_compatibilities = ["EC2", "FARGATE"]
+  requires_compatibilities = ["FARGATE"]
 }
 
 data "template_file" "matomo_adhoc_task_def" {
