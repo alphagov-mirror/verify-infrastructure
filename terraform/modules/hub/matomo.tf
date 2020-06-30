@@ -78,7 +78,7 @@ resource "aws_lb_listener" "matomo_https" {
 
 resource "aws_route53_record" "matomo" {
   zone_id = aws_route53_zone.ingress_www.id
-  name    = "matomo.${local.root_domain}"
+  name    = "analytics.${local.mgmt_domain}"
   type    = "A"
 
   alias {
@@ -463,8 +463,9 @@ data "template_file" "matomo_config_part_one_file" {
   template = file("${path.module}/files/matomo/matomo-config-file-part-one.ini.php")
 
   vars = {
-    db_host     = aws_db_instance.matomo.address
-    db_password = random_string.matomo_db_password.result
+    db_host      = aws_db_instance.matomo.address
+    db_password  = random_string.matomo_db_password.result
+    trusted_host = aws_route53_record.matomo.name
   }
 }
 

@@ -10,7 +10,7 @@ tables_prefix = "piwik_"
 [General]
 proxy_client_headers[] = "HTTP_X_FORWARDED_FOR"
 salt = "b5b70745221a30c8c3acaa6d149bf8cd"
-trusted_hosts[] = "analytics.tools.signin.service.gov.uk"
+trusted_hosts[] = "${trusted_host}"
 assume_secure_protocol=1
 datatable_archiving_maximum_rows_actions = 9000
 enable_plugins_admin = 0
