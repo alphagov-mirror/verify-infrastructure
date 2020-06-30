@@ -125,10 +125,13 @@ data "template_file" "matomo_task_def" {
 }
 
 resource "aws_ecs_task_definition" "matomo_task_def" {
-  family                = "matomo"
-  container_definitions = data.template_file.matomo_task_def.rendered
-  network_mode          = "awsvpc"
-  execution_role_arn    = aws_iam_role.matomo_execution.arn
+  family                   = "matomo"
+  container_definitions    = data.template_file.matomo_task_def.rendered
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.matomo_execution.arn
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 512
+  memory                   = 2048
 
   volume {
     name = local.volume_name
@@ -146,15 +149,13 @@ data "template_file" "matomo_archiving_task_def" {
 }
 
 resource "aws_ecs_task_definition" "matomo_archiving_task_def" {
-  family                = "matomo-archiving"
-  container_definitions = data.template_file.matomo_archiving_task_def.rendered
-  network_mode          = "awsvpc"
-  execution_role_arn    = aws_iam_role.matomo_execution.arn
-
-  cpu    = 512
-  memory = 2048
-
+  family                   = "matomo-archiving"
+  container_definitions    = data.template_file.matomo_archiving_task_def.rendered
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.matomo_execution.arn
   requires_compatibilities = ["FARGATE"]
+  cpu                      = 512
+  memory                   = 2048
 }
 
 data "template_file" "matomo_adhoc_task_def" {
@@ -166,10 +167,13 @@ data "template_file" "matomo_adhoc_task_def" {
 }
 
 resource "aws_ecs_task_definition" "matomo_adhoc_task_def" {
-  family                = "matomo-adhoc" ## TODO: namespacing?
-  container_definitions = data.template_file.matomo_adhoc_task_def.rendered
-  network_mode          = "awsvpc"
-  execution_role_arn    = aws_iam_role.matomo_execution.arn
+  family                   = "matomo-adhoc" ## TODO: namespacing?
+  container_definitions    = data.template_file.matomo_adhoc_task_def.rendered
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.matomo_execution.arn
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 512
+  memory                   = 2048
 }
 
 resource "aws_lb_target_group" "matomo" {
