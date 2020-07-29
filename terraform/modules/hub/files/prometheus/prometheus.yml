@@ -73,6 +73,13 @@ scrape_configs:
     dns_sd_configs:
       - names:
           - 'frontend.hub.local'
+  - job_name: saml-engine
+    scheme: 'https'
+    tls_config:
+      insecure_skip_verify: true
+    dns_sd_configs:
+      - names:
+          - 'saml-engine-fargate.hub.local'
   - job_name: apps
     scheme: 'https'
     metrics_path: '/prometheus/metrics'
