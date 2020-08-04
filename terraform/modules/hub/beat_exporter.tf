@@ -30,7 +30,6 @@ locals {
     "ingress",
     "static-ingress",
     "saml-proxy",
-    "saml-engine",
     "policy",
     "saml-soap-proxy",
   ]
