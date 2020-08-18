@@ -11,20 +11,8 @@ function run-until-success() {
   done
 }
 
-CURL="curl"
-if [ -n "${egress_proxy_url_with_protocol}" ]; then
-  CURL="curl --proxy ${egress_proxy_url_with_protocol}"
-fi
-
 # Apt
 echo 'Configuring apt'
-mkdir -p /etc/apt/apt.conf.d
-if [ -n "${egress_proxy_url_with_protocol}" ]; then
-  cat << EOF > /etc/apt/apt.conf.d/egress.conf
-Acquire::http::Proxy "${egress_proxy_url_with_protocol}/";
-Acquire::https::Proxy "${egress_proxy_url_with_protocol}/";
-EOF
-fi
 run-until-success "apt-get update --yes"
 run-until-success "apt-get dist-upgrade --yes"
 
@@ -131,7 +119,6 @@ processors:
     overwrite_keys: false
 
 output.elasticsearch:
-  ${journalbeat_egress_proxy_setting}
   hosts: ["https://${logit_elasticsearch_url}:443"]
   headers:
     Apikey: ${logit_api_key}
