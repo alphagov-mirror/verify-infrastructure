@@ -14,6 +14,11 @@ resource "aws_iam_role" "deployer" {
           ]
         },
         "Effect": "Allow"
+      },
+      {
+        "Action": "ec2:ReleaseAddress",
+        "Resource": "*",
+        "Effect": "Deny"
       }
     ]
   }
