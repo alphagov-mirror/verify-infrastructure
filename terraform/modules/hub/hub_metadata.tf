@@ -4,6 +4,8 @@ resource "aws_security_group" "metadata_task" {
   description = "${var.deployment}-metadata-task"
 
   vpc_id = aws_vpc.hub.id
+
+  count = var.manage_metadata
 }
 
 data "template_file" "metadata_task_def" {
@@ -23,6 +25,8 @@ module "metadata_ecs_roles" {
   service_name     = "metadata"
   tools_account_id = var.tools_account_id
   image_name       = "verify-metadata"
+
+  count = var.manage_metadata
 }
 
 resource "aws_ecs_task_definition" "metadata_fargate" {
@@ -33,6 +37,8 @@ resource "aws_ecs_task_definition" "metadata_fargate" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
+
+  count = var.manage_metadata
 }
 
 resource "aws_ecs_service" "metadata_fargate" {
@@ -45,6 +51,8 @@ resource "aws_ecs_service" "metadata_fargate" {
   deployment_maximum_percent         = 100
 
   launch_type = "FARGATE"
+
+  count = var.manage_metadata
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ingress_metadata.arn
@@ -71,6 +79,8 @@ resource "aws_service_discovery_service" "metadata_fargate" {
   name = "${var.deployment}-metadata"
 
   description = "service discovery for ${var.deployment}-metadata-fargate instances"
+
+  count = var.manage_metadata
 
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.hub_apps.id

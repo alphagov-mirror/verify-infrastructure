@@ -114,6 +114,8 @@ resource "aws_lb_target_group" "ingress_metadata" {
     interval = 10
     timeout  = 5
   }
+
+  count = var.manage_metadata
 }
 
 resource "aws_lb_target_group" "ingress_frontend" {
@@ -227,6 +229,8 @@ resource "aws_lb_listener_rule" "ingress_metadata" {
       values = ["/SAML2/metadata/*"]
     }
   }
+
+  count = var.manage_metadata
 }
 
 resource "aws_lb_listener_rule" "ingress_analytics" {
